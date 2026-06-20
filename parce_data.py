@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
 class meta_zone:
@@ -52,12 +52,34 @@ class Parce_Data:
         except (FileNotFoundError, PermissionError, IsADirectoryError) as e:
             raise Exception(f"Error: {type(e).__name__}: {e}")
 
-    
-    def parce_meta_data(self, line, avaible_keys):
-        pass 
-    
-    
-    
+    # hub: corridorA 4 3 [zone=priority color=green max_drones=2]
+    def parce_meta_data(self, data: str, avaible_keys: List[str]):
+        # print(data)
+        pass
+
+    def validation_line(self, line: str) -> Tuple[str, Tuple, str]:
+        comment_line = line.split("#")
+        valid_line: List[str] = comment_line[0].split()
+        line_str = ' '.join(valid_line)
+        if line_str.split("]", 1)[1].strip():
+            raise ValueError("Unexpected text after metadata brackets")
+        i = line_str.find(':')
+        j = line_str.find('[')
+        e = line_str.find(']')
+        data_zone = line_str[i + 1 : j].strip().split()
+        if len(data_zone) > 3:
+            raise ValueError(
+                "Zone definition requires a name,x ,y and meta_data")
+        else:
+            try:
+                if '-' in data_zone[0]:
+                    raise ValueError("invalid characters in name drone")
+                res = (data_zone[0], (int(data_zone[1]), int(data_zone[2])))
+                print(res)
+            except ValueError as e:
+                raise ValueError(e)
+            return res
+
     def parce_data(self, file: List[str]):
         flag = 0
         for line_nb, line in enumerate(file, start=1):
@@ -66,25 +88,30 @@ class Parce_Data:
                 continue
             try:
                 if flag == 0:
-                    if line.startswith("nb_drones") and self.nb_drones == 0:
-                        self.nb_drones = int(line.split(":",1)[1].strip())
+                    if line.startswith("nb_drones:") and self.nb_drones == 0:
+                        self.nb_drones = int(line.split(":", 1)[1].strip())
                         flag = 1
-                        if self.nb_drones <=0:
-                            raise ValueError(f"nb_drones must be a positive")
+                        if self.nb_drones <= 0:
+                            raise ValueError("nb_drones must be a positive")
                     else:
-                        raise ValueError(f"Name: nb_drones must be 'nb_drones'")
-                elif line.startswith("nb_drones") and self.nb_drones:
+                        raise ValueError("Name: nb_drones must be 'nb_drones'")
+                elif line.startswith("nb_drones:") and self.nb_drones:
                     raise ValueError("nb_drones is  duplicated")
-                elif line.startswith("start_hub"):
+
+                elif line.startswith("start_hub:"):
                     if self.start_hub is None:
-                        line_zone = line
+                        list_line = self.validation_line(line)
+                        # meata_data = self.parce_meta_data(list_line[2], ["zone","color","max_drones"])
+                        
+                        
             except Exception as e:
-                raise Exception(f"Error in line {line_nb}: {type(e).__name__}: {e}")
-            
-            
+                raise Exception(
+                    f"Error in line {line_nb}: {type(e).__name__}: {e}")
+
+
 p = Parce_Data()
 file = p.read_file("maps/challenger/01_the_impossible_dream.txt")
 try:
     p.parce_data(file)
-except Exception as e :
-    print (e)
+except Exception as e:
+    print(e)
