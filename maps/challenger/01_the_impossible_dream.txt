@@ -1,0 +1,22 @@
+# CHALLENGER LEVEL: THE IMPOSSIBLE DREAM
+# WARNING: This map is designed to be extremely challenging and may not be solvable
+# by most algorithms. It's intended as a stress test and research challenge.
+# The goal is NOT to validate this map but to push algorithmic limits.
+
+nb_drones: 5
+
+end_hub: goal 10 10 [color=yellow]
+start_hub: start 0 0 [color=green max_drones=4]
+
+hub: roof2 6 2 [zone=normal color=blue]
+hub: obstacleX 5 5 [zone=blocked color=gray]
+hub: tunnelB 7 4 [zone=normal color=red]
+hub: corridorA 4 3 [zone=priority color=green max_drones=2]
+hub: roof1 3 4 [zone=restricted color=red]
+
+connection: start-roof1
+connection: start-corridorA
+connection: roof1-roof2
+connection: roof2-roof1
+connection: corridorA-tunnelB [max_link_capacity=2]
+connection: tunnelB-goal
