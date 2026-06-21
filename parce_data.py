@@ -141,9 +141,12 @@ class Parce_Data:
         return res
 
     def parce_data(self, file: List[str]) -> None:
-        flag = 0
-        valid_key = ["zone", "color", "max_drones"]
-        valid_connection = ["max_link_capacity"]
+        flag: int = 0
+        valid_key:List[str] = ["zone", "color", "max_drones"]
+        valid_connection: List[str] = ["max_link_capacity"]
+        zone_name:List[str] = []
+        zone_coord:List[Tuple[int,int]] = []
+        connections_name:List[str] = []
         for line_nb, line in enumerate(file, start=1):
             line = line.strip()
             if not line or line.startswith('#'):
@@ -159,35 +162,53 @@ class Parce_Data:
                         raise ValueError(
                             "Name: nb_drones must be 'nb_drones:'")
                 elif line.startswith("nb_drones:") and self.nb_drones:
-                    raise ValueError("nb_drones is  duplicated")
+                    raise ValueError("line nb_drones is  duplicated")
 
                 elif line.startswith("start_hub:"):
                     if self.start_hub is None:
                         list_line: Tuple = self.validation_line(
                             line, valid_key)
                         name, (x, y), meta = list_line
+                        if name in zone_name:
+                            raise ValueError("start_hub_name: duplicated")
+                        if (x,y) in zone_coord:
+                            raise ValueError("start_hub_coord: duplicated")
+                        zone_name.append(name)
+                        zone_coord.append((x,y))
                         z_type = meta.get('zone', 'normal')
                         z_color = meta.get('color', None)
-                        z_max = meta.get('max_drones', self.nb_drones)
+                        z_max = self.nb_drones
                         self.start_hub = Zone(name, x, y, z_type, z_color,
                                               z_max)
                     else:
-                        raise ValueError("start_hub is  duplicated")
+                        raise ValueError("line start_hub is  duplicated")
                 elif line.startswith("end_hub:"):
                     if self.end_hub is None:
                         list_line: Tuple = self.validation_line(
                             line, valid_key)
                         name, (x, y), meta = list_line
+                        if name in zone_name:
+                            raise ValueError("end_hub_name: duplicated")
+                        if (x,y) in zone_coord:
+                            raise ValueError("end_hub_coord: duplicated")
+                        zone_name.append(name)
+                        zone_coord.append((x,y))
                         z_type = meta.get('zone', 'normal')
                         z_color = meta.get('color', None)
-                        z_max = meta.get('max_drones', self.nb_drones)
+                        z_max = self.nb_drones
                         self.end_hub = Zone(name, x, y, z_type, z_color, z_max)
                     else:
-                        raise ValueError("end_hub is  duplicated")
+                        raise ValueError("line end_hub is duplicated")
                 
                 elif line.startswith("hub:"):
                     list_line: Tuple = self.validation_line(line, valid_key)
                     name, (x, y), meta = list_line
+                    if name in zone_name:
+                            raise ValueError("hub_name: duplicated")
+                    if (x,y) in zone_coord:
+                            raise ValueError("hub_coord: duplicated")
+                    zone_name.append(name)
+                    zone_coord.append((x,y))
                     z_type = meta.get('zone', 'normal')
                     z_color = meta.get('color', None)
                     z_max = meta.get('max_drones', 1)
@@ -197,6 +218,8 @@ class Parce_Data:
                     list_line: Tuple = self.validation_line(
                         line, valid_connection, 1)
                     zone1, zone2, meta = list_line
+                    if zone1 not in zone_name or zone2 not in zone_name:
+                        raise ValueError("invalid name connection")
                     max_link = meta.get('max_link_capacity', 1)
                     self.connections.append(Connection(zone1, zone2, max_link))
                 else:
@@ -207,18 +230,3 @@ class Parce_Data:
                 raise Exception(
                     f"Error in line {line_nb}: {type(e).__name__}: {e}")
 
-
-try:
-    p = Parce_Data()
-    file = p.read_file("maps/challenger/01_the_impossible_dream.txt")
-    p.parce_data(file)
-    for k, v in p.hub.items():
-        print(k)
-except Exception as e:
-    print(e)
-
-# dupplacated zon
-# dupplicated coordination
-# IF COLORE NOT DEFFINE PICK THE DEFAULT ONE
-
-# START AND THE END MUST BE ALWALYS MAX_DRONE
