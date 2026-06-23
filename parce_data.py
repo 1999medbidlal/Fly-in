@@ -304,6 +304,8 @@ class Parce_Data:
                 elif line.startswith("connection"):
                     list_line = self.validation_line(line, valid_connection, 1)
                     name_conz1, name_conz2, _ = list_line
+                    if name_conz1 == name_conz2:
+                        raise ValueError("a hub can't connect to it self")
                     current_pair = sorted([name_conz1, name_conz2])
                     if (current_pair) in connections_name:
                         raise ValueError("connection: duplicated")
