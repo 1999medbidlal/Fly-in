@@ -2,7 +2,7 @@ install:
 	@pip install flake8
 	@pip install mypy
 run: 
-	@python3 main.py maps/medium/01_dead_end_trap.txt
+	@python3 main.py maps/hard/03_ultimate_challenge.txt
 debug:
 	@python3 -m pdb
 clean:
