@@ -1,8 +1,8 @@
 install:
 	@pip install flake8
 	@pip install mypy
-run: install
-	@python3 main.py maps/challenger/01_the_impossible_dream.txt
+run: 
+	@python3 main.py maps/medium/01_dead_end_trap.txt
 debug:
 	@python3 -m pdb
 clean:

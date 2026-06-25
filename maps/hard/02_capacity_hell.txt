@@ -24,7 +24,7 @@ connection: start-gate3 [max_link_capacity=1]
 connection: gate1-gate2 [max_link_capacity=1]
 connection: gate2-gate3 [max_link_capacity=1]
 
-# Waiting areas for queue management
+# Waiting areas for queue p1agement
 connection: gate1-waiting_area1
 connection: gate2-waiting_area2
 connection: gate3-waiting_area3

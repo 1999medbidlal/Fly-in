@@ -1,9 +1,12 @@
 from parce_data import Parce_Data
+from Visualisation import run
 import sys
+
 if __name__ == "__main__":
-    try:
+    # try:
         p = Parce_Data()
         file = p.read_file(sys.argv[1])
         p.parce_data(file)
-    except Exception as e:
-        print(e)
+        run(p)
+    # except Exception as e:
+    #     print(f"Error: {type(e).__name__}: {e}")   
