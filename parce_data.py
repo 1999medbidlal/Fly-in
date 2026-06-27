@@ -297,7 +297,7 @@ class Parce_Data:
                     zone_name.append(name)
                     zone_coord.append((x, y))
                     z_type = meta.get('zone', 'normal')
-                    z_color = meta.get('color', None)
+                    z_color = meta.get('color', "gray")
                     z_max = meta.get('max_drones', 1)
                     self.hub[name] = Zone(name, x, y, z_type, z_color, z_max)
 

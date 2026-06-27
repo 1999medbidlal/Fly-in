@@ -2,7 +2,7 @@ install:
 	@pip install flake8
 	@pip install mypy
 run: 
-	@python3 main.py maps/hard/03_ultimate_challenge.txt
+	@python3 main.py maps/medium/02_circular_loop.txt
 debug:
 	@python3 -m pdb
 clean:

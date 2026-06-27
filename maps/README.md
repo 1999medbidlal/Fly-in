@@ -66,10 +66,10 @@ Cycles in the graph that can cause infinite loops in poorly designed algorithms.
 All maps are designed to be solvable with a well-implemented algorithm. However:
 
 - **Easy maps**: Should solve quickly with any reasonable approach
-- **Medium maps**: May require backtracking, path optimization, or capacity p1agement
-- **Hard maps**: Dep1d sophisticated algorithms with proper conflict resolution and optimization
+- **Medium maps**: May require backtracking, path optimization, or capacity management
+- **Hard maps**: Demand sophisticated algorithms with proper conflict resolution and optimization
 
-## Perforp1ce Benchmarks
+## Performance Benchmarks
 
 - **Easy**: < 10 simulation turns typically
 - **Medium**: 10-30 simulation turns depending on optimization

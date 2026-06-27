@@ -1,5 +1,5 @@
 from parce_data import Parce_Data
-from Visualisation import run
+from visualisation import run
 import sys
 
 if __name__ == "__main__":
