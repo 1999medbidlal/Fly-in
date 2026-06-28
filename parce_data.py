@@ -63,7 +63,7 @@ class Connection:
         """
 
 
-class Parce_Data:
+class Data:
     """
     Handles parsing, validation, and loading of simulation map files
     """
@@ -268,6 +268,7 @@ class Parce_Data:
                         z_max = self.nb_drones
                         self.start_hub = Zone(name, x, y, z_type, z_color,
                                               z_max)
+                        self.hub[name] = Zone(name, x, y, z_type, z_color, z_max)
                     else:
                         raise ValueError("line start_hub is  duplicated")
                 elif line.startswith("end_hub"):
@@ -284,6 +285,8 @@ class Parce_Data:
                         z_color = meta.get('color', None)
                         z_max = self.nb_drones
                         self.end_hub = Zone(name, x, y, z_type, z_color, z_max)
+                        self.hub[name] = Zone(name, x, y, z_type, z_color, z_max)
+                        
                     else:
                         raise ValueError("line end_hub is duplicated")
 
