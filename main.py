@@ -9,8 +9,8 @@ if __name__ == "__main__":
         file = data.read_file(sys.argv[1])
         data.parce_data(file)
         graph = Graph(data)
-        graph.refind_path()
-        # run(data, path)
+        path = graph.refind_path()
+        run(data, path)
         
     # except Exception as e:
     #     print(f"Error: {type(e).__name__}: {e}")   
