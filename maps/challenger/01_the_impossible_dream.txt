@@ -3,7 +3,7 @@
 # by most algorithms. It's intended as a stress test and research challenge.
 # The goal is NOT to validate this map but to push algorithmic limits.
 
-nb_drones: 25
+nb_drones: 6
 
 # === LAYER 0: The Nightmare Begins ===
 start_hub: start 0 0 [color=green max_drones=25]
@@ -20,12 +20,12 @@ hub: gate_hell5 6 0 [color=red max_drones=1]
 hub: maze_trap_a1 2 1 [color=purple]
 hub: maze_trap_a2 3 1 [color=purple]
 hub: maze_trap_a3 4 1 [color=purple]
-hub: maze_dead_a 5 1 [color=red]
+hub: maze_dead_a 5 1 [color=black]
 
 hub: maze_trap_b1 2 -1 [color=purple]
 hub: maze_trap_b2 3 -1 [color=purple]
 hub: maze_trap_b3 4 -1 [color=purple]
-hub: maze_dead_b 5 -1 [color=white]
+hub: maze_dead_b 5 -1 [color=black]
 
 hub: maze_loop1 2 2 [zone=restricted color=brown]
 hub: maze_loop2 3 2 [zone=restricted color=brown]
@@ -56,11 +56,11 @@ hub: false_hope3 12 0 [zone=priority color=gold max_drones=1]
 # More dead ends disguised as good paths
 hub: priority_trap1 10 1 [zone=priority color=gold]
 hub: priority_trap2 11 1 [zone=priority color=gold]
-hub: priority_dead 12 1 [color=blue]
+hub: priority_dead 12 1 [color=black]
 
 hub: priority_trap3 10 -1 [zone=priority color=gold]
 hub: priority_trap4 11 -1 [zone=priority color=gold]
-hub: priority_dead2 12 -1 [color=orange]
+hub: priority_dead2 12 -1 [color=black]
 
 # === LAYER 4: The Convergence Hell ===
 # Multiple restricted paths that must merge

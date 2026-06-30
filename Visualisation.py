@@ -213,7 +213,7 @@ def run(data, path):
     zones = Zones_visu(data, screen)
     conx = Connection_visu(data, screen)
 
-    my_paths = {"drone1": path[0]}
+    my_paths = {"drone1": path[1]}
 
     drone = Drones_visu(data, screen, my_paths)
     pause = False

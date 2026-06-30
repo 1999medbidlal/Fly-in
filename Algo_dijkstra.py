@@ -11,15 +11,15 @@ class Graph:
         self.start = self.data.start_hub
         self.end = self.data.end_hub
         self.key_cost = {
-                "normal": 1.0,
-                "blocked": 1.0,
-                "restricted": 2.0,
-                "priority": 0.9
-            }
+            "normal": 1.0,
+            "blocked": 1.0,
+            "restricted": 2.0,
+            "priority": 0.9
+        }
         self.cost = {
-                key: self.key_cost[value.type_zone]
-                for key, value in self.data.hub.items()
-            }
+            key: self.key_cost[value.type_zone]
+            for key, value in self.data.hub.items()
+        }
 
     def get_neighbor(self):
         for conx in self.data.connections:
@@ -31,7 +31,7 @@ class Graph:
 
     def algo_dijkstra(self) -> List[str]:
         if self.start is None or self.end is None:
-            raise ValueError("zone None")
+            raise ValueError("zone should be not None")
 
         weight: Dict[str, float] = {
             zone: float("inf")
@@ -57,8 +57,6 @@ class Graph:
                     weight[n.name] = new_weight
                     queue.append(n)
                     res[n.name] = current_zone.name
-        if weight[self.data.end_hub.name] == float("inf"):
-            raise ValueError("not path found")
         path = []
         zone: str = self.end.name
         path.append(zone)
@@ -68,7 +66,7 @@ class Graph:
             if zone == self.start.name:
                 return path[::-1]
 
-    def refind_path(self):
+    def refind_path(self) -> List[List[str]]:
         all_path = []
         while True:
             path = self.algo_dijkstra()
@@ -77,5 +75,5 @@ class Graph:
             all_path.append(path)
             for name_zone in path:
                 self.cost[name_zone] += 5
-            
+
         return all_path
