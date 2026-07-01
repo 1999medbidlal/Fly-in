@@ -11,9 +11,11 @@ if __name__ == "__main__":
         data.parce_data(file)
         graph = Graph(data)
         path = graph.refind_path()
-        # sim = Sim(graph)
-        # sim.run_simulation()
-        run(data, path)
+        # print(path)
+        sim = Sim(graph)
+        while not sim.is_finished():
+            sim.run_simulation()
+        # run(data, path)
         
     # except Exception as e:
     #     print(f"Error: {type(e).__name__}: {e}")   
