@@ -1,5 +1,7 @@
 import pygame
+from typing import Dict, List
 from parce_data import Data
+from simulation import Sim
 
 
 class Screen:
@@ -109,18 +111,10 @@ class Connection_visu(Zones_visu):
         self.color_conx = get_color("gray")
         super().__init__(data, screen)
 
-    def get_hub_by_name(self, name):
-        if name == self.data.start_hub.name:
-            return self.data.start_hub
-        if name == self.data.end_hub.name:
-            return self.data.end_hub
-        if name in self.data.hub:
-            return self.data.hub[name]
-
     def draw_connection(self):
         for c in self.data.connections:
-            res_zon1 = self.get_hub_by_name(c.zone1)
-            res_zon2 = self.get_hub_by_name(c.zone2)
+            res_zon1 = self.data.hub[c.zone1]
+            res_zon2 = self.data.hub[c.zone2]
             pos1 = self.screen.screen_coords(res_zon1.x, res_zon1.y)
             pos2 = self.screen.screen_coords(res_zon2.x, res_zon2.y)
             pygame.draw.line(self.screen.mode_scr, self.color_conx, pos1, pos2,
@@ -129,62 +123,88 @@ class Connection_visu(Zones_visu):
 
 class Drones_visu(Connection_visu):
 
-    def __init__(self, data, screen, path):
+    def __init__(self, data: Data, screen: Screen, sim: Sim):
         super().__init__(data, screen)
-        self.path = path
+        self.sim = sim
+        self.screen: Screen = screen
         self.img = pygame.image.load("img/drone.png")
         self.img = pygame.transform.scale(self.img, (60, 60))
-        self.drones_list = []
+        self.drone_positions = {}
+        self.nb_turn = 0
 
-        for i, (dr_name, path_names) in enumerate(self.path.items(), start=1):
-            self.path_pixels = []
-            for name in path_names:
-                res = self.get_hub_by_name(name)
-                d_x, d_y = self.screen.screen_coords(res.x, res.y)
-                self.path_pixels.append((d_x, d_y))
-            drone_info = {
-                "name": dr_name,
-                "path_pixels": self.path_pixels,
-                "current_x": self.path_pixels[0][0],
-                "current_y": self.path_pixels[0][1],
-                "target": 1,
-                "speed": 8,
-                "delay": i * 30
-            }
-            self.drones_list.append(drone_info)
+        for drone in self.sim.drones:
+            start_zone = drone.path[drone.pos]
+            res = self.data.hub[start_zone]
+            d_x, d_y = self.screen.screen_coords(res.x, res.y)
+            self.drone_positions[drone.id] = {
+                "current_x": d_x,
+                "current_y": d_y,
+                "target_x": d_x,
+                "target_y": d_y,
+                "is_move":False,
+                "steps": 10,
+            }   
+    def move_drones(self, res:List[Dict]):
+        self.nb_turn = self.sim.nb_turn 
 
-    def move_drones(self):
-        for drone in self.drones_list:
-            if drone["delay"] > 0:
-                drone["delay"] -= 1
-                continue
-
-            if drone["target"] < len(drone["path_pixels"]):
-                target_x, target_y = drone["path_pixels"][drone["target"]]
-                dx = target_x - drone["current_x"]
-                dy = target_y - drone["current_y"]
+        for drone in res:
+            dr_id = drone["drone_id"]
+            dr_from = drone["current_zone"]
+            d_current = self.data.hub[dr_from]
+            f_x, f_y = self.screen.screen_coords(d_current.x, d_current.y) 
+            dr_target =  drone["to_zone"]
+            d_targt = self.data.hub[dr_target]    
+            t_x, t_y = self.screen.screen_coords(d_targt.x, d_targt.y)
+            if dr_id in self.drone_positions:
+                self.drone_positions[dr_id]["current_x"] = f_x 
+                self.drone_positions[dr_id]["current_y"] = f_y  
+                self.drone_positions[dr_id]["target_x"] = t_x 
+                self.drone_positions[dr_id]["target_y"] = t_y
+                self.drone_positions[dr_id]["is_move"]  = True
+                
+    def animation_drone(self):
+        all_move =  False
+        for drone in self.drone_positions.values():
+            if drone["is_move"]:
+                dx = drone["target_x"] - drone["current_x"]
+                dy = drone["target_y"] - drone["current_y"]
                 distance = (dx**2 + dy**2)**0.5
-                if distance <= drone["speed"]:
-                    drone["current_x"], drone["current_y"] = target_x, target_y
-                    drone["target"] += 1
+                if distance <= drone["steps"]:
+                    drone["current_x"] = drone["target_x"] 
+                    drone["current_y"] = drone["target_y"]
+                    drone["is_move"] = False
                 else:
-                    drone["current_x"] += (dx / distance) * drone["speed"]
-                    drone["current_y"] += (dy / distance) * drone["speed"]
+                    drone["current_x"] += (dx / distance) * drone["steps"]
+                    drone["current_y"] += (dy / distance) * drone["steps"]
+                    all_move = True
+        return all_move              
 
     def draw_drone(self) -> None:
         img_width = self.img.get_width()
         img_height = self.img.get_height()
-        for drone in self.drones_list:
-            if drone["delay"] == 0:
+        for drone in self.drone_positions.values():
                 pos_x = drone["current_x"] - img_width // 2
                 pos_y = drone["current_y"] - img_height // 2
                 self.screen.mode_scr.blit(self.img, (pos_x, pos_y))
 
+    def display_turn(self):
+        font = pygame.font.SysFont(None, 30)
+        text = font.render(f"NUMBER OF TURNS: {self.nb_turn}",True, get_color("black"))
+        self.screen.mode_scr.blit(text, (1300, 50))
+    
     def reset(self) -> None:
-        for drone in self.drones_list:
-            drone["current_x"] = self.path_pixels[0][0]
-            drone["current_y"] = self.path_pixels[0][1]
-            drone["target"] = 1
+            start_zone = self.data.start_hub
+            d_x, d_y = self.screen.screen_coords(start_zone.x, start_zone.y)
+            for drone in self.drone_positions.values():
+                drone["current_x"] =  d_x
+                drone["current_y"] =  d_y
+                drone["target_x"] = d_x
+                drone["target_y"] = d_y
+                drone["is_move"] = False
+            self.nb_turn = 0
+            self.sim.size_of_zone[self.data.end_hub.name][0] = 0
+                
+                
 
 
 def redrawGame(screen, zones, conx, drone):
@@ -192,6 +212,7 @@ def redrawGame(screen, zones, conx, drone):
     conx.draw_connection()
     zones.draw_zones()
     drone.draw_drone()
+    drone.display_turn()
 
     pygame.display.update()
 
@@ -204,7 +225,7 @@ def get_color(name_color):
         return pygame.Color("red")
 
 
-def run(data, path):
+def run(data, sim):
 
     pygame.init()
     screen = Screen(data)
@@ -213,9 +234,7 @@ def run(data, path):
     zones = Zones_visu(data, screen)
     conx = Connection_visu(data, screen)
 
-    my_paths = {"drone1": path[1]}
-
-    drone = Drones_visu(data, screen, my_paths)
+    drone = Drones_visu(data, screen, sim)
     pause = False
 
     while True:
@@ -233,5 +252,15 @@ def run(data, path):
                     quit()
 
         if not pause:
-            drone.move_drones()
+
+                if not sim.is_finished():
+                    is_moving = drone.animation_drone()
+                    if not is_moving:
+                        res = drone.sim.run_simulation()
+                        drone.move_drones(res)
+                        print(is_moving)
+                    else:
+                        drone.animation_drone()
+                    
+                
         redrawGame(screen, zones, conx, drone)

@@ -74,6 +74,6 @@ class Graph:
                 break
             all_path.append(path)
             for name_zone in path:
-                self.cost[name_zone] += 5
+                self.cost[name_zone] += 0.5
 
         return all_path
